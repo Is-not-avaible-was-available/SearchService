@@ -1,10 +1,10 @@
 package com.learning.SearchService.Util;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.FuzzyQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
 
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class ElasticSearchUtil {
@@ -36,4 +36,32 @@ public class ElasticSearchUtil {
     public static Supplier<Query> fuzzyQuerySupplier(String approxValue){
         return () -> Query.of(q -> q.fuzzy(fuzzyQuery(approxValue)));
     }
+
+    public static Supplier<Query> supplierBoolQuery(String title, Integer qty){
+        return () -> Query.of(q->q.bool(boolQuery(title, qty)));
+    }
+
+
+    public static BoolQuery boolQuery(String title, Integer qty){
+        var boolQuery = new BoolQuery.Builder();
+        return boolQuery.filter(termQuery(title)).must(matchQueries(qty)).build();
+    }
+
+    public static List<Query> termQuery(String fieldValue){
+        List<Query> terms = new ArrayList<>();
+        var termQuery = new TermQuery.Builder();
+        terms.add(Query
+                .of(q->q.term(termQuery.field("title").value(fieldValue).build())));
+
+        return terms;
+    }
+
+    public static List<Query> matchQueries(Integer quantity){
+        List<Query> matches = new ArrayList<>();
+        var matchQuery = new MatchQuery.Builder();
+        matches.add(Query
+                .of(q->q.match(matchQuery.field("qty").query(quantity).build())));
+        return matches;
+    }
+
 }

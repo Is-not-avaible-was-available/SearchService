@@ -77,4 +77,18 @@ public class ElasticSearchService {
         }
         return products;
     }
+
+    public List<Product> boolQuery(String title, Integer qty) throws IOException {
+        Supplier<Query> supplier = ElasticSearchUtil.supplierBoolQuery(title, qty);
+        SearchResponse<Product> searchResponse = elasticsearchClient
+                .search(s->s.index("eatables").query(supplier.get()), Product.class);
+
+        List<Hit<Product>> hitList = searchResponse.hits().hits();
+        List<Product> products = new ArrayList<>();
+        for(Hit<Product> hit: hitList){
+            Product product = (Product) hit.source();
+            products.add(product);
+        }
+        return products;
+    }
 }

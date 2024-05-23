@@ -47,4 +47,9 @@ public class ProductController{
         return elasticSearchService.findAllProductBasedOnFuzzySearch(titleFuzzy);
     }
 
+    @GetMapping("/products/bool/{title}/{qty}")
+    public List<Product> boolSearchOnTitleAndQty(@PathVariable String title
+            ,@PathVariable Integer qty) throws IOException {
+        return elasticSearchService.boolQuery(title,qty);
+    }
 }
